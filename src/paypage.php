@@ -15,12 +15,21 @@ class paypage
         $follow_transaction,
         $laravel_version,
         $package_version;
-    function __construct()
+    
+    protected $profileID;
+    protected $serverKey;
+    protected $region;
+
+    function __construct($profileID, $serverKey, $region)
     {
+        $profileID = $profileID ? $profileID : config('paytabs.profile_id');
+        $serverKey = $serverKey ? $serverKey : config('paytabs.server_key');
+        $region = $region ? $region : config('paytabs.region');
+
         $this->paytabsinit = new paytabs_core();
         $this->paytabs_core = new PaytabsRequestHolder();
         $this->paytabs_core_token = new PaytabsTokenHolder();
-        $this->paytabs_api = PaytabsApi::getInstance(config('paytabs.region'), config('paytabs.profile_id'), config('paytabs.server_key'));
+        $this->paytabs_api = PaytabsApi::getInstance($region, $profileID, $serverKey);
         $this->follow_transaction = new PaytabsFollowupHolder();
         $this->laravel_version = app()::VERSION;
         $this->package_version = '1.4.0';
