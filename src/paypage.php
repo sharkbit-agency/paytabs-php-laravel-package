@@ -19,17 +19,19 @@ class paypage
     protected $profileID;
     protected $serverKey;
     protected $region;
+    protected $currency;
 
-    function __construct($profileID, $serverKey, $region)
+    function __construct($profileID, $serverKey, $region, $currency)
     {
-        $profileID = $profileID ? $profileID : config('paytabs.profile_id');
-        $serverKey = $serverKey ? $serverKey : config('paytabs.server_key');
-        $region = $region ? $region : config('paytabs.region');
-
+        $this->profileID = $profileID ? $profileID : config('paytabs.profile_id');
+        $this->serverKey = $serverKey ? $serverKey : config('paytabs.server_key');
+        $this->region    = $region ? $region : config('paytabs.region');
+        $this->currency  = $currency ? $currency : config('paytabs.currency');
+        
         $this->paytabsinit = new paytabs_core();
         $this->paytabs_core = new PaytabsRequestHolder();
         $this->paytabs_core_token = new PaytabsTokenHolder();
-        $this->paytabs_api = PaytabsApi::getInstance($region, $profileID, $serverKey);
+        $this->paytabs_api = PaytabsApi::getInstance($this->region, $$this->profileID, $$this->serverKey);
         $this->follow_transaction = new PaytabsFollowupHolder();
         $this->laravel_version = app()::VERSION;
         $this->package_version = '1.4.0';
@@ -49,7 +51,7 @@ class paypage
 
     public function sendCart($cart_id, $amount, $cart_description)
     {
-        $this->paytabs_core->set03Cart($cart_id, config('paytabs.currency'), $amount, $cart_description);
+        $this->paytabs_core->set03Cart($cart_id, $this->currency, $amount, $cart_description);
         return $this;
     }
 
@@ -137,7 +139,7 @@ class paypage
     public function refund($tran_ref,$order_id,$amount,$refund_reason)
     {
         $this->follow_transaction->set02Transaction(PaytabsEnum::TRAN_TYPE_REFUND)
-            ->set03Cart($order_id, config('paytabs.currency'), $amount, $refund_reason)
+            ->set03Cart($order_id, $this->currency, $amount, $refund_reason)
             ->set30TransactionInfo($tran_ref)
             ->set99PluginInfo('Laravel', $this->laravel_version, $this->package_version);
 
@@ -166,7 +168,7 @@ class paypage
     public function capture($tran_ref,$order_id,$amount,$capture_description)
     {
         $this->follow_transaction->set02Transaction(PaytabsEnum::TRAN_TYPE_CAPTURE)
-            ->set03Cart($order_id, config('paytabs.currency'), $amount, $capture_description)
+            ->set03Cart($order_id, $this->currency, $amount, $capture_description)
             ->set30TransactionInfo($tran_ref)
             ->set99PluginInfo('Laravel', $this->laravel_version, $this->package_version);
 
@@ -194,7 +196,7 @@ class paypage
     public function void($tran_ref,$order_id,$amount,$void_description)
     {
         $this->follow_transaction->set02Transaction(PaytabsEnum::TRAN_TYPE_VOID)
-            ->set03Cart($order_id, config('paytabs.currency'), $amount, $void_description)
+            ->set03Cart($order_id, $this->currency, $amount, $void_description)
             ->set30TransactionInfo($tran_ref)
             ->set99PluginInfo('Laravel', $this->laravel_version, $this->package_version);
 
