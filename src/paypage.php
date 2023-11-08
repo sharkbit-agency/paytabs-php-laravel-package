@@ -31,7 +31,7 @@ class paypage
         $this->paytabsinit = new paytabs_core();
         $this->paytabs_core = new PaytabsRequestHolder();
         $this->paytabs_core_token = new PaytabsTokenHolder();
-        $this->paytabs_api = PaytabsApi::getInstance($this->region, $$this->profileID, $$this->serverKey);
+        $this->paytabs_api = PaytabsApi::getInstance($this->region, $this->profileID, $this->serverKey);
         $this->follow_transaction = new PaytabsFollowupHolder();
         $this->laravel_version = app()::VERSION;
         $this->package_version = '1.4.0';
